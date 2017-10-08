@@ -47,7 +47,7 @@ def capital_letters(filename):
         lines = line.split()
         for w in lines:
             total_words += 1
-            if w[0].lower() != w[0]:
+            if w not in stoplist and w[0].lower() != w[0]:
                 capital_words += 1
         line = f.readline()
 
@@ -65,7 +65,7 @@ tags_collection = ['NN', 'JJ', 'VB', 'RB', 'PRP']
 counts = [0, 0, 0, 0, 0]
 # amount of nouns, adjectives, verbs, adverbs, and pronouns
 
-def avg_numbers_of_chatacters(filename):
+def Percentage_of_5_tags(filename):
     f = open(filename,'r')
     line = f.readline()
     total_words = 0
@@ -76,15 +76,15 @@ def avg_numbers_of_chatacters(filename):
         total_words += len(w_lst)
 
         for w,tag in w_lst:
-            if tag in tags_collection:
+            if w not in stoplist and tag in tags_collection:
                 counts[tags_collection.index(tag)] += 1
 
         line = f.readline()
 
     f.close()
-    
+
     print f.name, ": ", map(lambda x: float(x)/total_words, counts)
 
-print('====== avg_numbers_of_chatacters ======')
-avg_numbers_of_chatacters('assignment1/ehr.txt')
-avg_numbers_of_chatacters('assignment1/medhelp.txt')
+print('====== Percentage_of_5_tags ======')
+Percentage_of_5_tags('assignment1/ehr.txt')
+Percentage_of_5_tags('assignment1/medhelp.txt')

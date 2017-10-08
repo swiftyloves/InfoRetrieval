@@ -1,5 +1,5 @@
 import nltk
-
+import collections
 # Clean stoplist
 f_stoplist = open('assignment1/stoplist.txt','r')
 stoplist = f_stoplist.readlines()
@@ -31,6 +31,7 @@ def computeStopwords(filename):
     print (f.name, ": ", float(stop_words)/total_words)
 
 
+print('====== computeStopwords ======')
 computeStopwords('assignment1/ehr.txt')
 computeStopwords('assignment1/medhelp.txt')
 
@@ -120,3 +121,45 @@ def Percentage_of_5_tags(filename):
 print('====== Percentage_of_5_tags ======')
 Percentage_of_5_tags('assignment1/ehr.txt')
 Percentage_of_5_tags('assignment1/medhelp.txt')
+
+
+# ====================================================
+# Top 10 nuons,verbs, and adjectives
+tags_collection = ['NN', 'VB', 'JJ']
+tags_amount = [{}, {}, {}]
+
+def top10(filename):
+    f = open(filename,'r')
+    line = f.readline()
+
+    while(line):
+        w_lst = nltk.word_tokenize(line)
+        w_lst = nltk.pos_tag(w_lst)
+        # total_words += len(w_lst)
+
+        for w,tag in w_lst:
+            if w not in stoplist:
+                if tag in tags_collection:
+                    tag_map = tags_amount[tags_collection.index(tag)]
+                    tags_amount[tags_collection.index(tag)][w] = tags_amount[tags_collection.index(tag)][w] + 1 if w in tag_map else 1
+
+        line = f.readline()
+    
+    f.close()
+
+    print f.name, ": "
+    i = 0;
+    for tag_map in tags_amount:
+        print tags_collection[i]
+        d = collections.Counter(tag_map)
+        for k,v in d.most_common(10):
+            print '%s: %i' % (k, v)
+        i += 1
+
+print('====== top10 ======')
+top10('assignment1/ehr.txt')
+top10('assignment1/medhelp.txt')
+
+
+
+

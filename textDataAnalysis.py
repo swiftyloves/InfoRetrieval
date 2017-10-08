@@ -28,7 +28,7 @@ while(line):
             ehr_map[w] = ehr_map[w] + 1 if w in ehr_map else 1
 
     # print lines_clean
-    line = f.readline().lower()
+    line = f.readline()
 
 
 # ehr_map = {w1: 3, w2: 2, w3: 3, w4: 4 ...}

@@ -3,13 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+# Clean stoplist
 f_stoplist = open('assignment1/stoplist.txt','r')
 stoplist = f_stoplist.readlines()
 
 
 for i,w in enumerate(stoplist):
     stoplist[i] = w.replace("\r\n","")
-# print stoplist
 
 operators = [".",",",":",";","\n","[","]","(",")","{","}","*","-"]
 remove_list = stoplist + operators

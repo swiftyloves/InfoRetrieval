@@ -58,4 +58,33 @@ print('====== capital_letters ======')
 capital_letters('assignment1/ehr.txt')
 capital_letters('assignment1/medhelp.txt')
 
+# ====================================================
+# Percentage of nouns, adjectives, verbs, adverbs, and pronouns
 
+tags_collection = ['NN', 'JJ', 'VB', 'RB', 'PRP']
+counts = [0, 0, 0, 0, 0]
+# amount of nouns, adjectives, verbs, adverbs, and pronouns
+
+def avg_numbers_of_chatacters(filename):
+    f = open(filename,'r')
+    line = f.readline()
+    total_words = 0
+
+    while(line):
+        w_lst = nltk.word_tokenize(line)
+        w_lst = nltk.pos_tag(w_lst)
+        total_words += len(w_lst)
+
+        for w,tag in w_lst:
+            if tag in tags_collection:
+                counts[tags_collection.index(tag)] += 1
+
+        line = f.readline()
+
+    f.close()
+    
+    print f.name, ": ", map(lambda x: float(x)/total_words, counts)
+
+print('====== avg_numbers_of_chatacters ======')
+avg_numbers_of_chatacters('assignment1/ehr.txt')
+avg_numbers_of_chatacters('assignment1/medhelp.txt')

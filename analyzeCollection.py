@@ -46,9 +46,11 @@ def capital_letters(filename):
     while(line):
         lines = line.split()
         for w in lines:
-            total_words += 1
-            if w not in stoplist and w[0].lower() != w[0]:
-                capital_words += 1
+            # total_words += 1
+            if w not in stoplist:
+                total_words += 1
+                if w[0].lower() != w[0]:
+                    capital_words += 1
         line = f.readline()
 
     f.close()
@@ -57,6 +59,34 @@ def capital_letters(filename):
 print('====== capital_letters ======')
 capital_letters('assignment1/ehr.txt')
 capital_letters('assignment1/medhelp.txt')
+
+
+# ====================================================
+# avg_number_of_characters
+
+def avg_number_of_characters(filename):
+    f = open(filename,'r')
+    line = f.readline()
+    sum_characters = 0
+    total_words = 0
+
+    while(line):
+        lines = line.split()
+        for w in lines:
+            # total_words += 1
+            # sum_characters += len(w)
+            if w not in stoplist:
+                total_words += 1
+                sum_characters += len(w)
+        line = f.readline()
+
+    f.close()
+    print f.name, ": ", float(sum_characters)/total_words
+
+print('====== avg_number_of_characters ======')
+avg_number_of_characters('assignment1/ehr.txt')
+avg_number_of_characters('assignment1/medhelp.txt')
+
 
 # ====================================================
 # Percentage of nouns, adjectives, verbs, adverbs, and pronouns
@@ -73,11 +103,13 @@ def Percentage_of_5_tags(filename):
     while(line):
         w_lst = nltk.word_tokenize(line)
         w_lst = nltk.pos_tag(w_lst)
-        total_words += len(w_lst)
+        # total_words += len(w_lst)
 
         for w,tag in w_lst:
-            if w not in stoplist and tag in tags_collection:
-                counts[tags_collection.index(tag)] += 1
+            if w not in stoplist:
+                total_words += 1
+                if tag in tags_collection:
+                    counts[tags_collection.index(tag)] += 1
 
         line = f.readline()
 

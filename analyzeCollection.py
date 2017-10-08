@@ -21,7 +21,6 @@ def computeStopwords(filename):
     total_words = 0
     while(line):
         lines = line.split()
-        lines_clean = []
         for w in lines:
             total_words += 1
             if w in stoplist:
@@ -29,7 +28,6 @@ def computeStopwords(filename):
         line = f.readline().lower()
 
     f.close()
-
     print (f.name, ": ", float(stop_words)/total_words)
 
 
@@ -40,4 +38,24 @@ computeStopwords('assignment1/medhelp.txt')
 # Frequency of capital letters
 
 def capital_letters(filename):
+    f = open(filename,'r')
+    line = f.readline()
+    capital_words = 0
+    total_words = 0
+
+    while(line):
+        lines = line.split()
+        for w in lines:
+            total_words += 1
+            if w[0].lower() != w[0]:
+                capital_words += 1
+        line = f.readline()
+
+    f.close()
+    print f.name, ": ", float(capital_words)/total_words
+
+print('====== capital_letters ======')
+capital_letters('assignment1/ehr.txt')
+capital_letters('assignment1/medhelp.txt')
+
 

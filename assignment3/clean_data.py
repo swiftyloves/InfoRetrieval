@@ -67,14 +67,14 @@ for post in posts:
         else:
             new_str += ' '
     word_tokens = word_tokenize(new_str)
-    filtered_sentence = []
+    filtered_sentence = ''
     for w in word_tokens:
         # print('v',end="")
         w = w.lower()
         if not w in stop_words:
             w = w.replace('(', '')
             w = w.replace(')', '')
-            filtered_sentence.append(w)
+            filtered_sentence += w + ' '
     data = {
         'label': post[0],
         'text': filtered_sentence
@@ -84,6 +84,6 @@ for post in posts:
 
 ####### CACHE
 
-with open('traindata_clean.csv', 'a+') as csvfile:
+with open('traindata_clean_2.csv', 'a+') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writerows(result)

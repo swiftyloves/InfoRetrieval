@@ -1,22 +1,113 @@
+import sys
+
 import csv
-ifile  = open('traindata_clean.csv', "r")
+ifile  = open('traindata_clean_2.csv', "r")
 read = csv.reader(ifile)
 posts = []
+documents = []
+labels = []
 for row in read :
     posts.append(row)
+    labels.append(row[0])
+    documents.append(row[1])
+
+print(posts[0])
+print('documents[0]:',documents[0])
+print(documents[0])
+
+######## Feature Selection ##########
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+vectorizer = TfidfVectorizer(analyzer='word', ngram_range=(1,2), min_df = 0, stop_words = 'english')
+print('vectorizer.fit_transform(documents)...')
+tfidf_matrix = vectorizer.fit_transform(documents)
+# tfidf_matrix:
+# [[ 0.          0.          0.16903085  0.16903085  0.16903085  0.16903085
+#    0.          0.          0.          0.          0.16903085  0.          0.
+#    0.16903085  0.16903085  0.          0.          0.          0.          0.
+#    0.          0.16903085  0.16903085  0.          0.          0.          0.
+#    0.16903085  0.16903085  0.          0.          0.16903085  0.16903085
+#    0.16903085  0.16903085  0.          0.          0.          0.
+#    0.16903085  0.16903085  0.16903085  0.16903085  0.16903085  0.16903085
+#    0.16903085  0.16903085  0.16903085  0.16903085  0.16903085  0.16903085
+#    0.16903085  0.16903085  0.          0.          0.          0.          0.
+#    0.          0.          0.          0.16903085  0.16903085  0.          0.
+#    0.          0.          0.16903085  0.16903085  0.          0.          0.
+#    0.          0.          0.          0.          0.          0.          0.
+#    0.16903085  0.16903085  0.          0.          0.        ]
+#  [ 0.14285714  0.14285714  0.          0.          0.          0.
+#    0.14285714  0.14285714  0.14285714  0.14285714  0.          0.14285714
+#    0.14285714  0.          0.          0.14285714  0.14285714  0.14285714
+#    0.14285714  0.14285714  0.14285714  0.          0.          0.14285714
+#    0.14285714  0.14285714  0.14285714  0.          0.          0.14285714
+#    0.14285714  0.          0.          0.          0.          0.14285714
+#    0.14285714  0.14285714  0.14285714  0.          0.          0.          0.
+#    0.          0.          0.          0.          0.          0.          0.
+#    0.          0.          0.          0.14285714  0.14285714  0.14285714
+#    0.14285714  0.14285714  0.14285714  0.14285714  0.14285714  0.          0.
+#    0.14285714  0.14285714  0.14285714  0.14285714  0.          0.
+#    0.14285714  0.14285714  0.14285714  0.14285714  0.14285714  0.14285714
+#    0.14285714  0.14285714  0.14285714  0.14285714  0.          0.
+#    0.14285714  0.14285714  0.14285714]]
+# (6111, 115433)    0.200381919894
+# (#documetn, some term index) tf-idf score
 
 
+######## Feature Selection ##########
 
+from sklearn.feature_selection import chi2
+print('chi2...')
+# http://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.chi2.html
+# chi2(X, y)
+# X : {array-like, sparse matrix}, shape = (n_samples, n_features_in)
+# y : array-like, shape = (n_samples,)
+# Target vector (class labels).
 
-########  SVM ##########
+tmp = chi2(tfidf_matrix, labels)
+print('features_tfidf = tmp[1] < 0.05')
+selected_features_mapping = tmp[1] < 0.05 # magic number
+print('sum(selected_features_mapping)')
+# the number of features is equal to the value sum(selected_features_mapping)
+print(sum(selected_features_mapping))
+# only left to the feature that matters
+tfidf_matrix = tfidf_matrix[:, selected_features_mapping]
 
-# from sklearn import svm
+print(type(tfidf_matrix))
 
+feature_names_lst = vectorizer.get_feature_names()
+selected_feature_names_lst = []
+for i in range(len(feature_names_lst)):
+    if selected_features_mapping[i] == True:
+        selected_feature_names_lst.append(feature_names_lst[i])
+print(selected_features_mapping[1])
 
-########  export prediction ##########
-# res = np.array([np.arange(len(predicted_final)), predicted_final])
-# res = np.transpose(res)
-# with open('prediction/pohechen_xg12.csv', 'w') as w:
-#     w.write('Id,Category\n')
-#     np.savetxt(w, res, fmt='%i',  delimiter=",")
+############# map selected feature to corresponded tfidf score
+tfidf_dict_lst = []
+for i in range(len(documents)):
+    print('.', end="")
+    sys.stdout.flush()
+    full_data_dict = dict(zip(vectorizer.get_feature_names(), tfidf_matrix[i].toarray()[0]))
+    selected_data_dict = {}
+    for k in selected_feature_names_lst:
+        selected_data_dict[k] = full_data_dict[k] if k in full_data_dict else 0.0
 
+    tfidf_dict_lst.append(selected_data_dict)
+print('len(tfidf_dict_lst):',len(tfidf_dict_lst))
+print(tfidf_dict_lst[0])
+
+#############
+
+print('write out header')
+
+with open('tfidf_dict_lst.csv', 'w') as csvfile:
+    # just write headers now
+    writer = csv.DictWriter(csvfile, fieldnames=selected_feature_names_lst)
+    writer.writeheader()
+
+print('write out file')
+with open('tfidf_dict_lst.csv', 'a+') as csvfile:
+    print('-', end="")
+    sys.stdout.flush()
+    writer = csv.DictWriter(csvfile, fieldnames=selected_feature_names_lst)
+    writer.writerows(tfidf_dict_lst)

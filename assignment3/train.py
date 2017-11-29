@@ -14,6 +14,7 @@ for row in read :
 print(posts[0])
 print('documents[0]:',documents[0])
 print(documents[0])
+print(len(documents))
 
 ######## Feature Selection ##########
 
@@ -66,48 +67,64 @@ print('chi2...')
 
 tmp = chi2(tfidf_matrix, labels)
 print('features_tfidf = tmp[1] < 0.05')
-selected_features_mapping = tmp[1] < 0.05 # magic number
+selected_features_mapping = tmp[1] < 0.07 # magic number
 print('sum(selected_features_mapping)')
 # the number of features is equal to the value sum(selected_features_mapping)
 print(sum(selected_features_mapping))
 # only left to the feature that matters
-tfidf_matrix = tfidf_matrix[:, selected_features_mapping]
-
-print(type(tfidf_matrix))
+# tfidf_matrix = tfidf_matrix[:, selected_features_mapping]
 
 feature_names_lst = vectorizer.get_feature_names()
 selected_feature_names_lst = []
+print('selected_features: ')
 for i in range(len(feature_names_lst)):
-    if selected_features_mapping[i] == True:
+    if selected_features_mapping[i] == True: #####
+        print(i, ' ', feature_names_lst[i])
         selected_feature_names_lst.append(feature_names_lst[i])
-print(selected_features_mapping[1])
+print('len(selected_feature_names_lst)')
+print(len(selected_feature_names_lst))
 
 ############# map selected feature to corresponded tfidf score
 tfidf_dict_lst = []
+
+
 for i in range(len(documents)):
     print('.', end="")
+    if i % 500 == 0:
+        print('|', end="")
+    if i % 1000 == 0:
+        print('')
     sys.stdout.flush()
     full_data_dict = dict(zip(vectorizer.get_feature_names(), tfidf_matrix[i].toarray()[0]))
     selected_data_dict = {}
-    for k in selected_feature_names_lst:
-        selected_data_dict[k] = full_data_dict[k] if k in full_data_dict else 0.0
+    selected_data_lst = []
 
-    tfidf_dict_lst.append(selected_data_dict)
+    for k in selected_feature_names_lst:
+        value = full_data_dict[k] if k in full_data_dict else 0.0
+        selected_data_dict[k] = value
+        selected_data_lst.append(str(value))
+
+    data = {
+        'label': labels[i],
+        'tfidf': " ".join(selected_data_lst)
+    }
+    tfidf_dict_lst.append(data)
 print('len(tfidf_dict_lst):',len(tfidf_dict_lst))
 print(tfidf_dict_lst[0])
 
-#############
+############# CACHE ##################
 
 print('write out header')
+fieldnames = ['label', 'tfidf']
 
 with open('tfidf_dict_lst.csv', 'w') as csvfile:
     # just write headers now
-    writer = csv.DictWriter(csvfile, fieldnames=selected_feature_names_lst)
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
 
 print('write out file')
-with open('tfidf_dict_lst.csv', 'a+') as csvfile:
+with open('tfidf_dict_lst_007_3_string.csv', 'a+') as csvfile:
     print('-', end="")
     sys.stdout.flush()
-    writer = csv.DictWriter(csvfile, fieldnames=selected_feature_names_lst)
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writerows(tfidf_dict_lst)

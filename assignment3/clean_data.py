@@ -2,8 +2,8 @@
 
 
 # read file
-_file = open('train.tsv')
-with open('train.tsv', 'r') as _file:
+_file = open('test.tsv')
+with open('test.tsv', 'r') as _file:
     posts = [line.split('\t') for line in _file.readlines()]
 
 for post in posts:
@@ -33,10 +33,10 @@ fieldnames = ['label','text']
 # then check we can write the output file
 # we don't want to complete process and show error about not
 # able to write outputs
-with open('traindata_clean.csv', 'w') as csvfile:
-    # just write headers now
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-    writer.writeheader()
+# with open('traindata_clean.csv', 'w') as csvfile:
+#     # just write headers now
+#     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+#     writer.writeheader()
 
 punctuation = string.punctuation + "'`'"
 stop_punctuation_remove = punctuation.replace('()','')
@@ -60,6 +60,8 @@ result = []
 for post in posts:
     new_str = ""
     sentence = post[1]
+    print('.',end="")
+    sys.stdout.flush()
 
     for char in post[1]:
         if char not in stop_characters:
@@ -84,6 +86,6 @@ for post in posts:
 
 ####### CACHE
 
-with open('traindata_clean_2.csv', 'a+') as csvfile:
+with open('testdata_clean.csv', 'a+') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writerows(result)

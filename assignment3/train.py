@@ -1,6 +1,9 @@
 import sys
-
 import csv
+
+THERSHOULD = 0.2
+
+
 ifile  = open('traindata_clean_2.csv', "r")
 read = csv.reader(ifile)
 posts = []
@@ -65,9 +68,11 @@ print('chi2...')
 # y : array-like, shape = (n_samples,)
 # Target vector (class labels).
 
+
+
 tmp = chi2(tfidf_matrix, labels)
-print('features_tfidf = tmp[1] < 0.05')
-selected_features_mapping = tmp[1] < 0.07 # magic number
+print('features_tfidf = tmp[1] < 0.1')
+selected_features_mapping = tmp[1] < THERSHOULD # magic number
 print('sum(selected_features_mapping)')
 # the number of features is equal to the value sum(selected_features_mapping)
 print(sum(selected_features_mapping))
@@ -86,7 +91,6 @@ print(len(selected_feature_names_lst))
 
 ############# map selected feature to corresponded tfidf score
 tfidf_dict_lst = []
-
 
 for i in range(len(documents)):
     print('.', end="")
@@ -117,13 +121,14 @@ print(tfidf_dict_lst[0])
 print('write out header')
 fieldnames = ['label', 'tfidf']
 
-with open('tfidf_dict_lst.csv', 'w') as csvfile:
+with open('tfidf_dict_lst_fea_' + str(THERSHOULD) + '.csv', 'w') as csvfile:
     # just write headers now
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer = csv.DictWriter(csvfile, fieldnames=selected_feature_names_lst)
     writer.writeheader()
 
 print('write out file')
-with open('tfidf_dict_lst_007_3_string.csv', 'a+') as csvfile:
+file_name = 'tfidf_dict_lst_' + str(THERSHOULD) + '_string.csv'
+with open(file_name, 'a+') as csvfile:
     print('-', end="")
     sys.stdout.flush()
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
